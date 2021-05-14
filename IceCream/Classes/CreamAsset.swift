@@ -136,10 +136,13 @@ public class CreamAsset: Object {
     public static func create(objectID: String, propName: String, url: URL, shouldOverwrite: Bool = true) -> CreamAsset? {
         let creamAsset = CreamAsset(objectID: objectID, propName: propName)
         if shouldOverwrite {
-            do {
-                try FileManager.default.removeItem(at: creamAsset.filePath)
-            } catch {
-                // Os.log remove item failed error here
+            //Tate add 文件存在才需要移除，不然会有异常
+            if FileManager.default.fileExists(atPath: creamAsset.filePath.path){
+                do {
+                    try FileManager.default.removeItem(at: creamAsset.filePath)
+                } catch {
+                    // Os.log remove item failed error here
+                }
             }
         }
         if !FileManager.default.fileExists(atPath: creamAsset.filePath.path) {
@@ -158,7 +161,8 @@ extension CreamAsset {
     /// The default path for the storing of CreamAsset. That is:
     /// xxx/Document/CreamAsset/
     public static func creamAssetDefaultURL() -> URL {
-        let documentDir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+        //Tate add documentDirectory 修改为 libraryDirectory
+        let documentDir = try! FileManager.default.url(for: .libraryDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
         let commonAssetPath = documentDir.appendingPathComponent(className())
         if !FileManager.default.fileExists(atPath: commonAssetPath.path) {
             do {

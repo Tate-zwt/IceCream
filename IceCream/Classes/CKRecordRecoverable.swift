@@ -136,7 +136,11 @@ extension CKRecordRecoverable where Self: Object {
                 recordValue = record.value(forKey: prop.name) as? Data
             case .object:
                 if let asset = record.value(forKey: prop.name) as? CKAsset {
-                    recordValue = CreamAsset.parse(from: prop.name, record: record, asset: asset)
+                    var from = prop.name
+                    if from == "video" { //Tate add 这里判断一下,如果是视频字段，就加入.MP4后缀
+                        from = ".mp4"
+                    }
+                    recordValue = CreamAsset.parse(from: from, record: record, asset: asset)
                 } else if let owner = record.value(forKey: prop.name) as? CKRecord.Reference,
                     let ownerType = prop.objectClassName,
                     let schema = realm.schema.objectSchema.first(where: { $0.className == ownerType })
